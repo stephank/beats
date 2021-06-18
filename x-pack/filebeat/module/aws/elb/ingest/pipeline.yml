@@ -77,7 +77,7 @@ processors:
           (?:-|%{NUMBER:aws.elb.backend.http.response.status_code:long})
           %{NUMBER:http.request.body.bytes:long}
           %{NUMBER:http.response.body.bytes:long}
-          \"(?:-|%{WORD:http.request.method}) (?:-|%{NOTSPACE:http.request.referrer}) (?:-|HTTP/%{NOTSPACE:http.version})\"
+          \"(?:-|%{WORD:http.request.method}) (?:-|%{NOTSPACE:_tmp.url_orig}) (?:-|HTTP/%{NOTSPACE:http.version})\"
           \"%{DATA:user_agent.original}\"
           %{ELBSSL}
         ELBTCPLOG: >-
@@ -109,6 +109,11 @@ processors:
       if: 'ctx.http != null'
       field: event.category
       value: web
+
+  - uri_parts:
+      if: 'ctx.http != null'
+      field: _tmp.url_orig
+      ignore_failure: true
 
   - set:
       if: 'ctx.http == null'
